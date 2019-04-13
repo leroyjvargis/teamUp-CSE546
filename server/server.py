@@ -16,6 +16,12 @@ def register():
     engine.registerUser(request.form)
     return jsonify(success=True, status_code=200)
 
+@app.route('/create-event', methods=['POST'])
+def create_event():
+    if not request or not request.form:
+        abort(400)
+    engine.createEvent(request.headers.get('user'), request.form)
+    return jsonify(success=True, status_code=200)
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
