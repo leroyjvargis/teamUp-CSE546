@@ -1,6 +1,6 @@
 from google.cloud import firestore
 import requests, datetime
-
+import helpers
 
 def registerUser(user):
     ## user = {email: string, location: geopoint, name: string, phone: string, likes: string list}
@@ -34,8 +34,22 @@ def createEvent(user, event):
         u'datetime': datetime.datetime.now(),
         u'status': 'scheduled',
         u'created_by': user_ref,
-        u'participants': [{
-                'is_confimed': True,
-                'user': user_ref
-        }]
+        u'confirmed_participants': [user_ref]
     })
+
+def getUserEvents(user):
+    db = firestore.Client()
+    user_ref = db.collection(u'users').document(user)
+
+    query = db.collection(u'events').where(u'confirmed_participants', u'array_contains', user_ref)
+    query = query.stream() 
+    returnData = []
+    for each in query:
+        ## each is an event
+        data = each.to_dict()
+        data['created_by'] = helpers.parseUserFromReference(data['created_by'], "main") #.get().to_dict()
+        if 'location-coords' in data:
+            data['location-coords'] = '{},{}'.format(str(data['location-coords'].latitude), str(data['location-coords'].longitude))
+        del data['confirmed_participants']
+        returnData.append(data)
+    return returnData
