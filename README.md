@@ -18,3 +18,7 @@ Currently following this format:
     "googlePlacesAPIKey": "<api-key>"
 }
 ```
+
+### Places API types
+Uses Google Places API to populate location search.  
+The supported *types* or categories for the search filter are available [here](https://developers.google.com/places/supported_types)
