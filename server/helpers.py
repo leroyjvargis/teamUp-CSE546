@@ -1,4 +1,8 @@
 from google.cloud import firestore
+import geopy.distance
+import requests, json
+
+
 
 def parseUserFromReference(user, type="full"):
     ## type: full, main
@@ -16,3 +20,18 @@ def parseUserFromReference(user, type="full"):
     
     return data
 
+def parseGooglePlacesAPIResponse(original_location, response):
+    data = []
+    for each in response['results']:
+        original_coords = (float(original_location[0]), float(original_location[1]))
+        each_coords = (each['geometry']['location']['lat'], each['geometry']['location']['lng'])
+        obj = {
+            'name': each['name'],
+            'types': each['types'],
+            #'rating': each['rating'],
+            'address': each['vicinity'],
+            'distance': geopy.distance.vincenty(original_coords, each_coords).km
+        }
+        data.append(obj)
+    data = sorted(data, key=lambda kv: kv['distance'])
+    return data

@@ -30,6 +30,16 @@ def create_event():
     engine.createEvent(request.headers.get('user'), request.form)
     return jsonify(success=True, status_code=200)
 
+@app.route('/get-locations', methods=['GET'])
+def get_locations():
+    if not request or not request.form:
+        abort(400)
+    location = request.args.get('location').split(',')
+    category = request.args.get('category')
+    data = engine.getPlacesByCategory(location, category)
+    return jsonify(data)
+
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

@@ -1,6 +1,9 @@
 from google.cloud import firestore
-import requests, datetime
+import requests, datetime, json
 import helpers
+
+with open('creds.json') as json_file:  
+    creds = json.load(json_file)
 
 def registerUser(user):
     ## user = {email: string, location: geopoint, name: string, phone: string, likes: string list}
@@ -38,6 +41,8 @@ def createEvent(user, event):
     })
 
 def getUserEvents(user):
+    ## user = user-email, from header-value
+    ## TODO: change header to 
     db = firestore.Client()
     user_ref = db.collection(u'users').document(user)
 
@@ -48,8 +53,18 @@ def getUserEvents(user):
         ## each is an event
         data = each.to_dict()
         data['created_by'] = helpers.parseUserFromReference(data['created_by'], "main") #.get().to_dict()
-        if 'location-coords' in data:
-            data['location-coords'] = '{},{}'.format(str(data['location-coords'].latitude), str(data['location-coords'].longitude))
+        if 'locreturnation-coords' in data:
+            datreturna['location-coords'] = '{},{}'.format(str(data['location-coords'].latitude), str(data['location-coords'].longitude))
         del data['confirmed_participants']
         returnData.append(data)
     return returnData
+
+def getPlacesByCategory(location, category):
+    ## location = [<lat>,<long>], category = "sports"
+    ## google places API:    
+    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={},{}&radius=1500&type={}&key={}'.format(location[0], location[1], category, creds['googlePlacesAPIKey'])
+    response = requests.get(url)
+    data = response.json()
+    return helpers.parseGooglePlacesAPIResponse(location, data)[:5]
+
+#print (getPlacesByCategory(['33.4197241', '-111.9305695'], 'park'))
