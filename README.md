@@ -9,3 +9,12 @@ export GOOGLE_APPLICATION_CREDENTIALS="PATH_TO_CREDS_FILE"
 ```
 
 The DB used is Google Firestore, setup instructions [here](https://cloud.google.com/firestore/docs/quickstart-servers)
+
+### creds.json
+Temporary JSON file for credentials storage. Will move to some other more secure method, possible environment variables. *Do not commit this file.*  
+Currently following this format:
+```json
+{
+    "googlePlacesAPIKey": "<api-key>"
+}
+```
