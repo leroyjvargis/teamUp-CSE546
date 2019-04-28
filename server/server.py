@@ -14,12 +14,14 @@ def register():
     if not request or not request.form:
         abort(400)
     engine.registerUser(request.form)
-    return jsonify(success=True, status_code=200)
+    return jsonify(success=True, status_code=201)
 
 @app.route('/home', methods=['GET'])
 def home():
-    if not request or not request.headers.get('user'):
-        abort(500)
+    if not request:
+        abort(400)
+    if not request.headers.get('user'):
+        abort(401)
     events = engine.getUserEvents(request.headers.get('user'))
     return jsonify(events)
 
@@ -28,7 +30,7 @@ def create_event():
     if not request or not request.form:
         abort(400)
     engine.createEvent(request.headers.get('user'), request.form)
-    return jsonify(success=True, status_code=200)
+    return jsonify(success=True, status_code=201)
 
 @app.route('/get-locations', methods=['GET'])
 def get_locations():
@@ -38,6 +40,16 @@ def get_locations():
     category = request.args.get('category')
     data = engine.getPlacesByCategory(location, category)
     return jsonify(data)
+
+@app.route('/create-interest', methods=['POST'])
+def create_interest():
+    if not request or not request.form:
+        abort(400)
+    if not request.headers.get('user'):
+        abort(401)
+
+    engine.createUserInterest(request.headers.get('user'), request.form)
+    return jsonify(success=True, status_code=201)
 
 
 if __name__ == '__main__':

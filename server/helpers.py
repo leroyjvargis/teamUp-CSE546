@@ -35,3 +35,9 @@ def parseGooglePlacesAPIResponse(original_location, response):
         data.append(obj)
     data = sorted(data, key=lambda kv: kv['distance'])
     return data
+
+def parseGeoPoint(geopoint_location, convert_to='string',):
+    if convert_to == 'string':
+        return '{},{}'.format(str(geopoint_location.latitude), str(geopoint_location.longitude))
+    elif convert_to == 'list':
+        return [str(geopoint_location.latitude), str(geopoint_location.longitude)]
