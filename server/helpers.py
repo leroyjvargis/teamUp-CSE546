@@ -4,16 +4,16 @@ import requests, json
 
 
 
-def parseUserFromReference(user, type="full"):
-    ## type: full, main
+def parseUserFromReference(user, type_of_response ="full"):
+    ## type_of_response: full, main
     ## user: of type dict
 
     db = firestore.Client()
     data = user.get().to_dict()
-    if type == "full":
+    if type_of_response == "full":
         data['location'] = '{},{}'.format(str(data['location'].latitude), str(data['location'].longitude))
         return data
-    elif type == "main":
+    elif type_of_response == "main":
         del data['location']
         del data['likes']
         del data['phone']

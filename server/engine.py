@@ -1,5 +1,5 @@
 from google.cloud import firestore
-import requests, datetime, json, uuid
+import requests, datetime, json
 import helpers
 
 with open('creds.json') as json_file:  
