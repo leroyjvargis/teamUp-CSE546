@@ -8,7 +8,6 @@ def parseUserFromReference(user, type_of_response ="full"):
     ## type_of_response: full, main
     ## user: of type dict
 
-    db = firestore.Client()
     data = user.get().to_dict()
     if type_of_response == "full":
         data['location'] = '{},{}'.format(str(data['location'].latitude), str(data['location'].longitude))
@@ -41,3 +40,7 @@ def parseGeoPoint(geopoint_location, convert_to='string',):
         return '{},{}'.format(str(geopoint_location.latitude), str(geopoint_location.longitude))
     elif convert_to == 'list':
         return [str(geopoint_location.latitude), str(geopoint_location.longitude)]
+
+def getUserFromAuthHeader(user):
+    db = firestore.Client()
+    return db.collection(u'users').document(user)
