@@ -33,19 +33,19 @@ The supported *types* or categories for the search filter are available [here](h
     returns: list of events  
     ```json
     {  
-        category: string,  
-        created_by: {  
-            name: string,  
-            email: string  
-        },  
-        count_of_participants: number,  
-        datetime: datetime-object,  
-        details: string,  
-        event_id: string,  
-        max: number,  
-        min: number,  
-        name: string,  
-        status: string  
+        "category": "string",
+        "created_by": {
+            "name": "string",
+            "email": "string"
+        },
+        "count_of_participants": "<number>",
+        "datetime": "<datetime-object>",
+        "details": "string",
+        "event_id": "string",
+        "max": "number",
+        "min": "number",
+        "name": "string",
+        "status": "string"
     }  
     ```
 
@@ -56,16 +56,16 @@ The supported *types* or categories for the search filter are available [here](h
 &nbsp;&nbsp; location_coords: string, lat-lon separated by comma  
     returns: list of events  
     ```json
-    {  
-        category: string,  
-        count_of_participants: number,  
-        datetime: datetime-object,  
-        details: string,  
-        distance: float,  
-        location_coords: string,  
-        location_name: string,  
-        name: string,  
-        status: string  
+    {
+        "category": "string",
+        "count_of_participants": "number",
+        "datetime": "datetime-object",
+        "details": "string",
+        "distance": "float",
+        "location_coords": "string",
+        "location_name": "string",
+        "name": "string",
+        "status": "string"
     }  
     ```
 
@@ -77,14 +77,14 @@ The supported *types* or categories for the search filter are available [here](h
     request-body: form-data  
     ```json
     {  
-        name: string,  
-        details: string,  
-        location-name: string,  
-        location: string,  
-        min: number,  
-        max: number,  
-        datetime: string,  
-        category: string,  
+        "name": "string",
+        "details": "string",
+        "location-name": "string",
+        "location": "string",
+        "min": "number",
+        "max": "number",
+        "datetime": "string",
+        "category": "string"
     }
     ```
 
@@ -97,10 +97,10 @@ The supported *types* or categories for the search filter are available [here](h
     returns: list of locations/places  
     ```json
     {  
-        address: string,  
-        distance: float, distance in km from start location,  
-        name: string,  
-        types: list of string, containing category of location  
+        "address": "string",
+        "distance": "float, distance in km from start location",
+        "name": "string",
+        "types":" list of string, containing category of location"
     }
     ```
 
@@ -112,10 +112,10 @@ The supported *types* or categories for the search filter are available [here](h
     request-body: form-data  
     ```json
     {  
-        category: string,  
-        location: string,  
-        radius: string (in km),  
-        time_tag: string (eg: sat-eve)  
+        "category": "string",
+        "location": "string",
+        "radius": "string (in km)",
+        "time_tag": "string (eg: sat-eve)"
     }
     ```
 
