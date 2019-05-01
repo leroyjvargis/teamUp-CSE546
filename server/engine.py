@@ -25,8 +25,7 @@ def registerUser(user):
 
 
 def getUserEvents(user_ref):
-    ## user -> user-email, from header-value
-    ## TODO: change header to proper auth
+    ## user_ref -> user-reference
     db = firestore.Client()
     #user_ref = helpers.getUserFromAuthHeader(user_ref)
 
@@ -41,8 +40,7 @@ def getUserEvents(user_ref):
 
 
 def createUserInterest(user_ref, interest):
-    ## TODO: auth user
-    ## user -> user-email
+    ## user -> user-reference
     ## interest -> {category: <string>, location: <geopoint>, radius: <number>, time-tag: <string: 'sat-morn'>, user : <user-ref>}
     db = firestore.Client()
     #user_ref = helpers.getUserFromAuthHeader(user_auth)

@@ -6,7 +6,7 @@ import requests, json
 
 def parseUserFromReference(user, type_of_response ="full"):
     ## type_of_response: full, main
-    ## user: of type dict
+    ## user: of type dict or str (for system bot)
 
     if isinstance(user, str):
         return {"name": user, "email": user}
