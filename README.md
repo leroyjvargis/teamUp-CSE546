@@ -149,3 +149,9 @@ The supported *types* or categories for the search filter are available [here](h
         "status": "string"
     }  
     ```
+
+1. /get-categories: get all categories from system  
+    method: GET  
+    headers: -none-  
+    params: -none-  
+    returns: list of categories  

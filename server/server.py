@@ -116,6 +116,10 @@ def cancel_event_participation():
     # engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
     return jsonify(success=True), 200
 
+@app.route('/get-categories', methods=['GET'])
+def get_categories():
+    return jsonify(engine.getCategories())
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

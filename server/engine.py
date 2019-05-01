@@ -167,5 +167,8 @@ def getPlacesByCategory(location, category):
 
 ### END:: EVENT OPERATIONS ###
 
+def getCategories():
+    categories = ['sports', 'food']
+    return categories
 
 #print (getPlacesByCategory(['33.4197241', '-111.9305695'], 'park'))
