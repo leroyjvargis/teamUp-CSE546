@@ -26,10 +26,10 @@ The supported *types* or categories for the search filter are available [here](h
 ***
 
 ### API Reference
-1. /home: get all events of current user:  
+1. /home: get all events of current user  
     method: GET  
     params: -none-  
-    headers: Auth: <user_email>  
+    headers: Auth: //user_email//  
     returns: list of events  
     ```json
     {  
@@ -49,9 +49,9 @@ The supported *types* or categories for the search filter are available [here](h
     }  
     ```
 
-1. /get-nearby-events: get nearby events from user location:  
+1. /get-nearby-events: get nearby events from user location  
     method: GET  
-    headers: -none-  
+    headers: Auth: //user_email>//  
     params:  
 &nbsp;&nbsp; location_coords: string, lat-lon separated by comma  
     returns: list of events  
@@ -104,7 +104,7 @@ The supported *types* or categories for the search filter are available [here](h
     }
     ```
 
-1. /create-interest: create an interest request  
+1. /create-interest: create an interest request for current user  
     method: POST  
     headers: Auth: //user_email//  
     params: -none-  
