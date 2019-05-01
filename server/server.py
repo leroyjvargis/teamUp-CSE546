@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, abort
-import engine
+import engine, helpers
 
 app = Flask(__name__)
 
@@ -22,7 +22,12 @@ def home():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-    events = engine.getUserEvents(request.headers.get('Auth'))
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    events = engine.getUserEvents(user)
     return jsonify(events), 200
 
 @app.route('/get-nearby-events', methods=['GET'])
@@ -31,6 +36,11 @@ def get_nearby_events():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
+    try:
+        ## checking auth here
+        helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
     events = engine.getNearbyEvents(request.args.get('location_coords'))
     return jsonify(events), 200
 
@@ -38,7 +48,14 @@ def get_nearby_events():
 def create_event():
     if not request or not request.form:
         abort(400)
-    engine.createEvent(request.headers.get('Auth'), request.form)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.createEvent(user, request.form)
     return jsonify(success=True), 201
 
 @app.route('/get-locations', methods=['GET'])
@@ -56,8 +73,12 @@ def create_interest():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-
-    engine.createUserInterest(request.headers.get('Auth'), request.form)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.createUserInterest(user, request.form)
     return jsonify(success=True), 201
 
 @app.route('/cancel-event-participation', methods=['GET'])
@@ -66,7 +87,12 @@ def cancel_event_participation():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-    engine.cancelUserParticipationToEvent(request.headers.get('Auth'), request.args.get('event_id'))
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
     return jsonify(success=True), 200
 
 if __name__ == '__main__':

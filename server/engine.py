@@ -23,11 +23,11 @@ def registerUser(user):
         u'likes': user['likes'].split(',')
     })
 
-def getUserEvents(user_auth):
+def getUserEvents(user_ref):
     ## user -> user-email, from header-value
     ## TODO: change header to proper auth
     db = firestore.Client()
-    user_ref = helpers.getUserFromAuthHeader(user_auth)
+    #user_ref = helpers.getUserFromAuthHeader(user_ref)
 
     query = db.collection(u'events').where(u'confirmed_participants', u'array_contains', user_ref)
     query = query.stream() 
@@ -39,17 +39,18 @@ def getUserEvents(user_auth):
         data['created_by'] = helpers.parseUserFromReference(data['created_by'], "main") #.get().to_dict()
         if 'location_coords' in data:
             data['location_coords'] = helpers.parseGeoPoint(data['location_coords'])
+        data['count_of_participants'] = len(data['confirmed_participants'])
         del data['confirmed_participants']
         returnData.append(data)
     return returnData
 
 
-def createUserInterest(user_auth, interest):
+def createUserInterest(user_ref, interest):
     ## TODO: auth user
     ## user -> user-email
     ## interest -> {category: <string>, location: <geopoint>, radius: <number>, time-tag: <string: 'sat-morn'>, user : <user-ref>}
     db = firestore.Client()
-    user_ref = helpers.getUserFromAuthHeader(user_auth)
+    #user_ref = helpers.getUserFromAuthHeader(user_auth)
     location = interest['location'].split(',')
 
     db.collection(u'user_requests').add({
@@ -62,8 +63,9 @@ def createUserInterest(user_auth, interest):
         u'user': user_ref
     })
 
-def cancelUserParticipationToEvent(user_auth, eventID):
-    user_ref = helpers.getUserFromAuthHeader(user_auth)
+def cancelUserParticipationToEvent(user_ref, eventID):
+    ##TODO: handle errors
+    #user_ref = helpers.getUserFromAuthHeader(user_auth)
     db = firestore.Client()
 
     ## find the event and remove user
@@ -93,11 +95,11 @@ def cancelUserParticipationToEvent(user_auth, eventID):
 
 ### BEGIN:: EVENT OPERATIONS ###
 
-def createEvent(user_auth, event):
+def createEvent(user_ref, event):
     ## event -> {name: string, details: string, location-name: location-coords: geopoint, min: number, max: number, datetime: timestamp, status: string, participants: list, category: string}
     ## TODO: datetime
     db = firestore.Client()
-    user_ref = helpers.getUserFromAuthHeader(user_auth)
+    #user_ref = helpers.getUserFromAuthHeader(user_ref)
     location = event['location'].split(',')
 
     db.collection(u'events').add({
@@ -115,7 +117,7 @@ def createEvent(user_auth, event):
     })
 
 def getNearbyEvents(location_coords):
-    ##TODO: find a better way utilizing query in database rather than get all and filter
+    ##TODO: find a better way utilizing where query in firestore rather than get all and filter
     db = firestore.Client() 
     query = db.collection(u'events')
     query = query.stream()
@@ -137,6 +139,8 @@ def getNearbyEvents(location_coords):
                 returnData.append(data)
     return returnData
 
+def filterEvents(params):
+    sad = 1
 
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"

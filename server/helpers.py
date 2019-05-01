@@ -54,4 +54,8 @@ def parseGeoPoint(geopoint_location, convert_to='string'):
 
 def getUserFromAuthHeader(user):
     db = firestore.Client()
-    return db.collection(u'users').document(user)
+    document = db.collection(u'users').document(user)
+    if document.get().exists:
+        return document
+    else:
+        raise Exception ("Unauthorized user")
