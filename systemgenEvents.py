@@ -9,11 +9,11 @@ with open('server/creds.json') as json_file:
 def getPlacesByCategory(location, category,radii):
     ## location = [<lat>,<long>], category = "sports" , radii = 100* radius(conversion to meters but its not perfect conversion)
     ## google places API:    
-    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={},{}&radius={}&key={}'.format(location[0], location[1], radii, creds['googlePlacesAPIKey'])
+    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={},{}&radius={}&types={}&key={}'.format(location[0], location[1], radii, category, creds['googlePlacesAPIKey'])
     response = requests.get(url)
     data = response.json()
     # print(data['results'][0])
-    return parseGooglePlacesAPIResponse(location, data)[:5]
+    return parseGooglePlacesAPIResponse(location, data)
 
 
 def parseGooglePlacesAPIResponse(original_location, response):
@@ -49,23 +49,26 @@ def parseUserFromReference(user, type="full"):
     
     return data
 
-def getActiveRequests(timetag, category, eventCreated, status=True):
+def getActiveRequests(event_id, category, timetag):
     ## user = user-email, from header-value
     ## TODO: change header to 
     db = firestore.Client()
+    categoryType = "stadium"
 
-    query = db.collection(u'user_requests').where(u'is_active', u'==' , status).where(u'event_created', u'==' , eventCreated).where(u'category', u'==' ,category).where(u'time_tag', u'==' ,timetag)
+    query = db.collection(u'user_requests').where(u'event_id', u'==' , event_id).where(u'category', u'==' , category).where(u'time_tag', u'==' , timetag)
     query = query.stream()
     returnData = []
     for each in query:
         ## each is an event
+        request_id = each.id
         data = each.to_dict()
         nearby=[]
         if 'location' in data:
             data['location'] = '{},{}'.format(str(data['location'].latitude), str(data['location'].longitude))
+            data['request_id'] = request_id
             locationPoints = data['location'].split(',')
             # print(locationPoints)
-            nearby = getPlacesByCategory(locationPoints, data['category'], 100*int(data['radius']))
+            nearby = getPlacesByCategory(locationPoints, categoryType, 1000*int(data['radius']))
             data['nearby'] = nearby
 
         returnData.append(data)
@@ -73,8 +76,8 @@ def getActiveRequests(timetag, category, eventCreated, status=True):
     return returnData
     
 def findVenues(ActiveRequests, probableVenues):
-    for perrequest in ActiveRequests:
-        nearbyObj = perrequest['nearby']
+    for eachrequest in ActiveRequests:
+        nearbyObj = eachrequest['nearby']
         for eachplace in nearbyObj:
             obj = {
             'found_loc_coords': eachplace['place_coords'],
@@ -86,11 +89,14 @@ def findVenues(ActiveRequests, probableVenues):
         return probableVenues
 
 def findBestVenues(ActiveRequests, probableVenues):
+    # add set code for probableVenues
     for eachplacedict in probableVenues:
         eachplacedict['probCandidates'] = list()
-        for perrequest in ActiveRequests:
-            if(geopy.distance.geodesic(perrequest['location'],  eachplacedict['found_loc_coords']).km <= perrequest['radius'] ):
-                eachplacedict['probCandidates'].append(perrequest['user'])
+        eachplacedict['request_ids'] = list()
+        for eachrequest in ActiveRequests:
+            if(geopy.distance.geodesic(eachrequest['location'],  eachplacedict['found_loc_coords']).km <= eachrequest['radius']):
+                eachplacedict['probCandidates'].append(eachrequest['user'])
+                eachplacedict['request_ids'].append(eachrequest['request_id'])
     return probableVenues
             
 def createSystemEvent(category, event):
@@ -99,36 +105,46 @@ def createSystemEvent(category, event):
     # user_ref = db.collection(u'users').document(user)
     # location = event['location'].split(',')
 
-    doc_ref = db.collection(u'events').document(category+ " @ " +event['name'])
-    doc_ref.set({
+    # doc_ref = db.collection(u'events').document(category+ " @ " +event['name'])
+    a,b = db.collection(u'events').add({
         u'name': category + " @ " + event['name'],
-        u'location-name': event['name'],
+        u'location_name': event['name'],
         u'category': category,
         u'details': "Address : " + event['address'],
-        u'location-coords': firestore.GeoPoint(float(event['found_loc_coords'][0]), float(event['found_loc_coords'][1])),
+        u'location_coords': firestore.GeoPoint(float(event['found_loc_coords'][0]), float(event['found_loc_coords'][1])),
         # u'min': int(event['min']),
         # u'max': int(event['max']),
-        u'datetime': datetime.datetime.now() + datetime.timedelta(days=4),
+        u'datetime': datetime.datetime.now() + datetime.timedelta(days=3),
         u'status': 'scheduled',
         u'created_by': 'System Bot',
         u'confirmed_participants': event['probCandidates']
     })
+    print("printing id " + b.id)
+    for each_request_id in event['request_ids']:
+        print(each_request_id)
+        q= db.collection(u'user_requests').document(each_request_id).update({ u'event_id': b.id })
+        # q=q.stream()
+        # print(q)
+        # for each in q:
+        #     print(each.to_dict())
+        # # .set({ u'event_id': b.id })
+        
 
 
 def main():
     # timeTag = [u'Mon_mo',u'Mon_ev', u'Tues_mo', u'Tues_ev', u'Wed_mo', u'Wed_ev', u'Thurs_mo', u'Thurs_ev', u'Fri_mo', u'Fri_ev', u'Fri_nite', u'Sat_mo', u'Sat_ev', u'Sat_nite', u'Sun_mo', u'Sun_ev']
-    timeTag2 = [u'sat-noon', u'Sun_ev']
+    timeTag2 = [u'sun-morn', u'fri-eve']
     category = u'sports'
 
     for timetag in timeTag2:
-        ActiveRequests = getActiveRequests(timetag,category, False, True)
+        ActiveRequests = getActiveRequests("", category, timetag)
         if len(ActiveRequests) >0:
-            probableVenues = findVenues(ActiveRequests,[])
+            probableVenues = findVenues(ActiveRequests,[]) #set of probable venues
             # print(probableVenues)
             BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
             BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
-            print(*BestprobableVenues, sep='\n')
-            createSystemEvent('Soccer',BestprobableVenues[0])
+            # print(*BestprobableVenues, sep='\n')
+            createSystemEvent('sports',BestprobableVenues[2])
 
 if __name__== "__main__":
     main()
