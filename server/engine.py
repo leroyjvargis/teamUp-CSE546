@@ -60,8 +60,32 @@ def createUserInterest(user_auth, interest):
         u'user': user_ref
     })
 
-def cancelUserParticipationToEvent(user)
-    s = 1
+def cancelUserParticipationToEvent(user_auth, eventID):
+    user_ref = helpers.getUserFromAuthHeader(user_auth)
+    db = firestore.Client()
+
+    ## find the event and remove user
+    doc_ref = db.collection(u'events').document(eventID)
+    event_document = doc_ref.get().to_dict()
+    category = event_document['category']
+    #event_document['confirmed_participants'].remove(user_ref) 
+    event_document['confirmed_participants'] = [x.get().to_dict() for x in event_document['confirmed_participants']]
+    user = user_ref.get().to_dict()
+    event_document['confirmed_participants'].remove(user)
+    event_document['confirmed_participants'] = [db.collection(u'users').document(x['email']) for x in event_document['confirmed_participants']]
+    doc_ref.set(event_document)
+
+    ## find the interest and update is_active
+    ## TODO: find exact interest request
+    if event_document['created_by'] == 'System Bot':
+        doc_ref = db.collection(u'user_requests').where(u'user', u'==', user_ref).where(u'category', u'==', category)
+        document = doc_ref.stream()
+        for each in document:
+            each_id = each.id
+            each = each.to_dict()
+            each['is_active'] = True
+            db.collection(u'user_requests').document(each_id).set(each)
+
 ### END:: USER OPERATIONS ###
 
 

@@ -20,16 +20,16 @@ def register():
 def home():
     if not request:
         abort(400)
-    if not request.headers.get('user'):
+    if not request.headers.get('Auth'):
         abort(401)
-    events = engine.getUserEvents(request.headers.get('user'))
+    events = engine.getUserEvents(request.headers.get('Auth'))
     return jsonify(events), 200
 
 @app.route('/create-event', methods=['POST'])
 def create_event():
     if not request or not request.form:
         abort(400)
-    engine.createEvent(request.headers.get('user'), request.form)
+    engine.createEvent(request.headers.get('Auth'), request.form)
     return jsonify(success=True), 201
 
 @app.route('/get-locations', methods=['GET'])
@@ -45,12 +45,20 @@ def get_locations():
 def create_interest():
     if not request or not request.form:
         abort(400)
-    if not request.headers.get('user'):
+    if not request.headers.get('Auth'):
         abort(401)
 
-    engine.createUserInterest(request.headers.get('user'), request.form)
+    engine.createUserInterest(request.headers.get('Auth'), request.form)
     return jsonify(success=True), 201
 
+@app.route('/cancel-event-participation', methods=['GET'])
+def cancel_event_participation():
+    if not request or not request.args.get('event_id'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    engine.cancelUserParticipationToEvent(request.headers.get('Auth'), request.headers.get('Auth'))
+    return jsonify(success=True), 200
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
