@@ -25,6 +25,15 @@ def home():
     events = engine.getUserEvents(request.headers.get('Auth'))
     return jsonify(events), 200
 
+@app.route('/get-nearby-events', methods=['GET'])
+def get_nearby_events():
+    if not request or not request.args.get('location_coords'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    events = engine.getNearbyEvents(request.args.get('location_coords'))
+    return jsonify(events), 200
+
 @app.route('/create-event', methods=['POST'])
 def create_event():
     if not request or not request.form:

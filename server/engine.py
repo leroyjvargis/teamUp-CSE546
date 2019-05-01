@@ -114,6 +114,29 @@ def createEvent(user_auth, event):
         u'confirmed_participants': [user_ref]
     })
 
+def getNearbyEvents(location_coords):
+    ##TODO: find a better way utilizing query in database rather than get all and filter
+    db = firestore.Client() 
+    query = db.collection(u'events')
+    query = query.stream()
+    location = location_coords.split(',')
+    location_coords = (float(location[0]), float(location[1]))
+
+    returnData = []
+    for each in query:
+        data = each.to_dict()
+        if 'location_coords' in data:
+            distance = helpers.calculateDistanceBetweenLocationCoordinates(location_coords, helpers.parseGeoPoint(data['location_coords'], 'tuple'))
+            #print (each.id, distance)
+            if distance < 25:
+                data['count_of_participants'] = len(data['confirmed_participants'])
+                del data['confirmed_participants']
+                del data['created_by']
+                data['location_coords'] = helpers.parseGeoPoint(data['location_coords'])
+                data['distance'] = distance
+                returnData.append(data)
+    return returnData
+
 
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"

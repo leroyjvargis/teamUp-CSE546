@@ -31,17 +31,26 @@ def parseGooglePlacesAPIResponse(original_location, response):
             'types': each['types'],
             #'rating': each['rating'],
             'address': each['vicinity'],
-            'distance': geopy.distance.vincenty(original_coords, each_coords).km
+            'distance': calculateDistanceBetweenLocationCoordinates(original_coords, each_coords)
         }
         data.append(obj)
     data = sorted(data, key=lambda kv: kv['distance'])
     return data
 
-def parseGeoPoint(geopoint_location, convert_to='string',):
+def calculateDistanceBetweenLocationCoordinates(coords_1, coords_2, unit='km'):
+    distance = geopy.distance.vincenty(coords_1, coords_2)
+    if unit == "km":
+        return distance.km
+    else:
+        return distance.miles
+
+def parseGeoPoint(geopoint_location, convert_to='string'):
     if convert_to == 'string':
         return '{},{}'.format(str(geopoint_location.latitude), str(geopoint_location.longitude))
     elif convert_to == 'list':
         return [str(geopoint_location.latitude), str(geopoint_location.longitude)]
+    elif convert_to == 'tuple':
+        return (float(geopoint_location.latitude), float(geopoint_location.longitude))
 
 def getUserFromAuthHeader(user):
     db = firestore.Client()
