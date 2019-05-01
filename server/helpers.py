@@ -63,10 +63,13 @@ def getUserFromAuthHeader(user):
 def parseEventData(event, location_coords = None, created_by = "none"):
     ## event -> firestore document reference of /events/<id>
     data = event.to_dict()
+    print (data)
     if location_coords is not None:
         distance = calculateDistanceBetweenLocationCoordinates(location_coords, parseGeoPoint(data['location_coords'], 'tuple'))
         data['distance'] = distance
     data['count_of_participants'] = len(data['confirmed_participants'])
+    if 'max' in data:
+        data['vacancy'] = data['max'] - data['count_of_participants'] if data['max'] - data['count_of_participants'] > 0 else 0
     data['location_coords'] = parseGeoPoint(data['location_coords'])
     del data['confirmed_participants']
     if created_by is not "none":
