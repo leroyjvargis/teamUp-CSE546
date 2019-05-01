@@ -31,21 +31,23 @@ The supported *types* or categories for the search filter are available [here](h
     params: -none-  
     headers: Auth: <user_email>  
     returns: list of events  
-&nbsp;  {  
-&nbsp;&nbsp;&nbsp;&nbsp; category: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; created_by: {  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; email: string  
-&nbsp;&nbsp;&nbsp;&nbsp; },  
-&nbsp;&nbsp;&nbsp;&nbsp; count_of_participants: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; datetime: datetime-object,  
-&nbsp;&nbsp;&nbsp;&nbsp; details: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; event_id: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; max: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; min: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; status: string  
-&nbsp; }  
+    ```json
+    {  
+        category: string,  
+        created_by: {  
+            name: string,  
+            email: string  
+        },  
+        count_of_participants: number,  
+        datetime: datetime-object,  
+        details: string,  
+        event_id: string,  
+        max: number,  
+        min: number,  
+        name: string,  
+        status: string  
+    }  
+    ```
 
 1. /get-nearby-events: get nearby events from user location:  
     method: GET  
@@ -53,34 +55,38 @@ The supported *types* or categories for the search filter are available [here](h
     params:  
 &nbsp;&nbsp; location_coords: string, lat-lon separated by comma  
     returns: list of events  
-&nbsp;        {  
-&nbsp;&nbsp;&nbsp;&nbsp; category: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; count_of_participants: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; datetime: datetime-object,  
-&nbsp;&nbsp;&nbsp;&nbsp; details: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; distance: float,  
-&nbsp;&nbsp;&nbsp;&nbsp; location_coords: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; location_name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; status: string  
-&nbsp; }  
+    ```json
+    {  
+        category: string,  
+        count_of_participants: number,  
+        datetime: datetime-object,  
+        details: string,  
+        distance: float,  
+        location_coords: string,  
+        location_name: string,  
+        name: string,  
+        status: string  
+    }  
+    ```
 
 1. /create-event: create an event  
     method: POST  
     headers: Auth: //user_email//  
     params: -none-  
-    returns: -none-
+    returns: -none-  
     request-body: form-data  
-&nbsp;        {
-&nbsp;&nbsp;&nbsp;&nbsp; name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; details: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; location-name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; location: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; min: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; max: number,  
-&nbsp;&nbsp;&nbsp;&nbsp; datetime: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; category: string,  
-&nbsp; }
+    ```json
+    {  
+        name: string,  
+        details: string,  
+        location-name: string,  
+        location: string,  
+        min: number,  
+        max: number,  
+        datetime: string,  
+        category: string,  
+    }
+    ```
 
 1. /get-locations: get places from current location and category  
     method: GET  
@@ -89,12 +95,14 @@ The supported *types* or categories for the search filter are available [here](h
 &nbsp;&nbsp; location: coordinates as string  
 &nbsp;&nbsp; category: string  
     returns: list of locations/places  
-&nbsp;          {  
-&nbsp;&nbsp;&nbsp;&nbsp; address: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; distance: float, distance in km from start location,  
-&nbsp;&nbsp;&nbsp;&nbsp; name: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; types: list of string, containing category of location  
-&nbsp; }
+    ```json
+    {  
+        address: string,  
+        distance: float, distance in km from start location,  
+        name: string,  
+        types: list of string, containing category of location  
+    }
+    ```
 
 1. /create-interest: create an interest request  
     method: POST  
@@ -102,12 +110,14 @@ The supported *types* or categories for the search filter are available [here](h
     params: -none-  
     returns: -none-  
     request-body: form-data  
-&nbsp;        {
-&nbsp;&nbsp;&nbsp;&nbsp; category: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; location: string,  
-&nbsp;&nbsp;&nbsp;&nbsp; radius: string (in km),  
-&nbsp;&nbsp;&nbsp;&nbsp; time_tag: string (eg: sat-eve)  
-&nbsp; }
+    ```json
+    {  
+        category: string,  
+        location: string,  
+        radius: string (in km),  
+        time_tag: string (eg: sat-eve)  
+    }
+    ```
 
 1. /cancel-event-participation: remove current user from an event  
     method: GET  
