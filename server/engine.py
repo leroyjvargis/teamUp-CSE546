@@ -53,10 +53,11 @@ def createUserInterest(user_auth, interest):
 
     db.collection(u'user_requests').add({
         u'category': interest['category'],
-        u'is_active': True,
+        #u'is_active': True,
         u'location': firestore.GeoPoint(float(location[0]), float(location[1])),
         u'radius': int(interest['radius']),
         u'time_tag': interest['time_tag'],
+        u'event_id': "",
         u'user': user_ref
     })
 
@@ -67,7 +68,6 @@ def cancelUserParticipationToEvent(user_auth, eventID):
     ## find the event and remove user
     doc_ref = db.collection(u'events').document(eventID)
     event_document = doc_ref.get().to_dict()
-    category = event_document['category']
     #event_document['confirmed_participants'].remove(user_ref) 
     event_document['confirmed_participants'] = [x.get().to_dict() for x in event_document['confirmed_participants']]
     user = user_ref.get().to_dict()
@@ -78,7 +78,7 @@ def cancelUserParticipationToEvent(user_auth, eventID):
     ## find the interest and update is_active
     ## TODO: find exact interest request
     if event_document['created_by'] == 'System Bot':
-        doc_ref = db.collection(u'user_requests').where(u'user', u'==', user_ref).where(u'category', u'==', category)
+        doc_ref = db.collection(u'user_requests').where(u'user', u'==', user_ref).where(u'event_id', u'==', eventID)
         document = doc_ref.stream()
         for each in document:
             each_id = each.id

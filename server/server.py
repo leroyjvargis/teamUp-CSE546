@@ -57,7 +57,7 @@ def cancel_event_participation():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-    engine.cancelUserParticipationToEvent(request.headers.get('Auth'), request.headers.get('Auth'))
+    engine.cancelUserParticipationToEvent(request.headers.get('Auth'), request.args.get('event_id'))
     return jsonify(success=True), 200
 
 if __name__ == '__main__':
