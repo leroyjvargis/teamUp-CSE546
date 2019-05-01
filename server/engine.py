@@ -34,13 +34,7 @@ def getUserEvents(user_ref):
     returnData = []
     for each in query:
         ## each is an event
-        data = each.to_dict()
-        data['event_id'] = each.id
-        data['created_by'] = helpers.parseUserFromReference(data['created_by'], "main") #.get().to_dict()
-        if 'location_coords' in data:
-            data['location_coords'] = helpers.parseGeoPoint(data['location_coords'])
-        data['count_of_participants'] = len(data['confirmed_participants'])
-        del data['confirmed_participants']
+        data = helpers.parseEventData(each, None, "main")
         returnData.append(data)
     return returnData
 
@@ -131,13 +125,10 @@ def getNearbyEvents(location_coords):
             distance = helpers.calculateDistanceBetweenLocationCoordinates(location_coords, helpers.parseGeoPoint(data['location_coords'], 'tuple'))
             #print (each.id, distance)
             if distance < 25:
-                data['count_of_participants'] = len(data['confirmed_participants'])
-                del data['confirmed_participants']
-                del data['created_by']
-                data['location_coords'] = helpers.parseGeoPoint(data['location_coords'])
-                data['distance'] = distance
+                data = helpers.parseEventData(each, location_coords)
                 returnData.append(data)
     return returnData
+
 
 def filterEvents(location_coords, event_name, vacancy, distance, category):
     ## TODO: filter based on other params
