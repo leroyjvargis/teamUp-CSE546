@@ -8,16 +8,18 @@ def parseUserFromReference(user, type_of_response ="full"):
     ## type_of_response: full, main
     ## user: of type dict
 
-    data = user.get().to_dict()
-    if type_of_response == "full":
-        data['location'] = '{},{}'.format(str(data['location'].latitude), str(data['location'].longitude))
+    if isinstance(user, str):
+        return {"name": user, "email": user}
+    else:
+        data = user.get().to_dict()
+        if type_of_response == "full":
+            data['location'] = '{},{}'.format(str(data['location'].latitude), str(data['location'].longitude))
+            return data
+        elif type_of_response == "main":
+            del data['location']
+            del data['likes']
+            del data['phone']    
         return data
-    elif type_of_response == "main":
-        del data['location']
-        del data['likes']
-        del data['phone']
-    
-    return data
 
 def parseGooglePlacesAPIResponse(original_location, response):
     data = []
