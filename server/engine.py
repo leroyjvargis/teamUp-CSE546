@@ -35,6 +35,7 @@ def getUserEvents(user_auth):
     for each in query:
         ## each is an event
         data = each.to_dict()
+        data['event_id'] = each.id
         data['created_by'] = helpers.parseUserFromReference(data['created_by'], "main") #.get().to_dict()
         if 'location_coords' in data:
             data['location_coords'] = helpers.parseGeoPoint(data['location_coords'])
@@ -76,7 +77,7 @@ def cancelUserParticipationToEvent(user_auth, eventID):
     doc_ref.set(event_document)
 
     ## find the interest and update is_active
-    ## TODO: find exact interest request
+    ## find exact interest request based on eventId
     if event_document['created_by'] == 'System Bot':
         doc_ref = db.collection(u'user_requests').where(u'user', u'==', user_ref).where(u'event_id', u'==', eventID)
         document = doc_ref.stream()
