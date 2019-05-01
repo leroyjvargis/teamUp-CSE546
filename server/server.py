@@ -69,8 +69,10 @@ def get_locations():
 
 @app.route('/filter-events', methods=['GET'])
 def filter_events():
-    if not request or not request.args.get('location'):
+    if not request:
         abort(400)
+    if request.args.get('distance') and not request.args.get('location'):
+        abort (400)
     if not request.headers.get('Auth'):
         abort(401)
     try:
@@ -84,7 +86,7 @@ def filter_events():
     vacancy = request.args.get('vacancy')
     distance = request.args.get('distance')
     category = request.args.get('category')
-    data = engine.filterEvents(location, event_name, vacancy, distance, category)
+    data = engine.filterEvents(event_name, vacancy, distance, location, category)
     return jsonify(data), 200
 
 @app.route('/create-interest', methods=['POST'])

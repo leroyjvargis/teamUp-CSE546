@@ -23,6 +23,7 @@ def registerUser(user):
         u'likes': user['likes'].split(',')
     })
 
+
 def getUserEvents(user_ref):
     ## user -> user-email, from header-value
     ## TODO: change header to proper auth
@@ -56,6 +57,7 @@ def createUserInterest(user_ref, interest):
         u'event_id': "",
         u'user': user_ref
     })
+
 
 def cancelUserParticipationToEvent(user_ref, eventID):
     ##TODO: handle errors
@@ -110,6 +112,7 @@ def createEvent(user_ref, event):
         u'confirmed_participants': [user_ref]
     })
 
+
 def getNearbyEvents(location_coords):
     ##TODO: find a better way utilizing where query in firestore rather than get all and filter
     db = firestore.Client() 
@@ -130,13 +133,14 @@ def getNearbyEvents(location_coords):
     return returnData
 
 
-def filterEvents(location_coords, event_name, vacancy, distance, category):
+def filterEvents(event_name, vacancy, distance, location_coords, category):
     ## TODO: filter based on other params
     db = firestore.Client()
     events_ref = db.collection(u'events')
 
-    location = location_coords.split(',')
-    location_coords = (float(location[0]), float(location[1]))
+    if location_coords is not None:
+        location = location_coords.split(',')
+        location_coords = (float(location[0]), float(location[1]))
     returnData = []
     if event_name is not None:
         event_data = events_ref.where(u'name', u'==', event_name)
@@ -156,7 +160,6 @@ def filterEvents(location_coords, event_name, vacancy, distance, category):
     return returnData
 
 
-
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"
     ## google places API:    
@@ -170,5 +173,3 @@ def getPlacesByCategory(location, category):
 def getCategories():
     categories = ['sports', 'food']
     return categories
-
-#print (getPlacesByCategory(['33.4197241', '-111.9305695'], 'park'))
