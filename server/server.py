@@ -60,11 +60,31 @@ def create_event():
 
 @app.route('/get-locations', methods=['GET'])
 def get_locations():
-    if not request or not request.form:
+    if not request:
         abort(400)
     location = request.args.get('location').split(',')
     category = request.args.get('category')
     data = engine.getPlacesByCategory(location, category)
+    return jsonify(data), 200
+
+@app.route('/filter-events', methods=['GET'])
+def filter_events():
+    if not request or not request.args.get('location'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+
+    location = request.args.get('location')
+    event_name = request.args.get('event_name')
+    vacancy = request.args.get('vacancy')
+    distance = request.args.get('distance')
+    category = request.args.get('category')
+    data = engine.filterEvents(location, event_name, vacancy, distance, category)
     return jsonify(data), 200
 
 @app.route('/create-interest', methods=['POST'])
@@ -87,12 +107,13 @@ def cancel_event_participation():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-    try:
-        ## checking auth here
-        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
-    except:
-        abort(401)
-    engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
+    print (request.args.get('oo'))
+    # try:
+    #     ## checking auth here
+    #     user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    # except:
+    #     abort(401)
+    # engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
     return jsonify(success=True), 200
 
 if __name__ == '__main__':

@@ -59,3 +59,14 @@ def getUserFromAuthHeader(user):
         return document
     else:
         raise Exception ("Unauthorized user")
+
+def parseEventData(event, location_coords):
+    ## event -> firestore document reference of /events/<id>
+    data = event.to_dict()
+    distance = calculateDistanceBetweenLocationCoordinates(location_coords, parseGeoPoint(data['location_coords'], 'tuple'))
+    data['count_of_participants'] = len(data['confirmed_participants'])
+    data['distance'] = distance
+    data['location_coords'] = parseGeoPoint(data['location_coords'])
+    del data['confirmed_participants']
+    del data['created_by']
+    return data

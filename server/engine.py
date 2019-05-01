@@ -139,8 +139,32 @@ def getNearbyEvents(location_coords):
                 returnData.append(data)
     return returnData
 
-def filterEvents(params):
-    sad = 1
+def filterEvents(location_coords, event_name, vacancy, distance, category):
+    ## TODO: filter based on other params
+    db = firestore.Client()
+    events_ref = db.collection(u'events')
+
+    location = location_coords.split(',')
+    location_coords = (float(location[0]), float(location[1]))
+    returnData = []
+    if event_name is not None:
+        event_data = events_ref.where(u'name', u'==', event_name)
+        event_data = event_data.stream()
+        for each in event_data:
+            returnData = helpers.parseEventData(each, location_coords)
+    else:
+        events_data = events_ref.stream()
+        all_events = []
+        for each in events_data:
+            data = helpers.parseEventData(each, location_coords)
+            all_events.append(data)
+
+        ## filter events from all_events based on the other params
+        #[x for x in all_events if x['max'] - x['count_of_participants'] > vacancy]
+
+    return returnData
+
+
 
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"
