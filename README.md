@@ -125,3 +125,27 @@ The supported *types* or categories for the search filter are available [here](h
     params:  
 &nbsp;&nbsp; event_id: string  
     returns: -none-  
+
+1. /filter-events: filter events based on some params  
+    method: GET  
+    headers: Auth: //user_email//  
+    params: atleast one of the below are required  
+&nbsp;&nbsp; event_name: string, [optional], but others are ignored if this is supplied   
+&nbsp;&nbsp; vacancy: number [optional]  
+&nbsp;&nbsp; distance: number (in km), requires location_coords [optional]  
+&nbsp;&nbsp; location_coords: string, requried with distance [optional]  
+&nbsp;&nbsp; vacancy: number [optional]  
+    returns: 
+    ```json
+    {
+        "category": "string",
+        "count_of_participants": "number",
+        "datetime": "datetime-object",
+        "details": "string",
+        "distance": "float",
+        "location_coords": "string",
+        "location_name": "string",
+        "name": "string",
+        "status": "string"
+    }  
+    ```
