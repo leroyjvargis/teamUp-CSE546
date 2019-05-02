@@ -32,14 +32,14 @@ def loginUser(user):
 def getUserEvents(user_ref):
     ## user_ref -> user-reference
     db = firestore.Client()
-    #user_ref = helpers.getUserFromAuthHeader(user_ref)
+    user_data = user_ref.get().to_dict()
 
     query = db.collection(u'events').where(u'is_active', u'==', True).where(u'confirmed_participants', u'array_contains', user_ref)
     query = query.stream() 
     returnData = []
     for each in query:
         ## each is an event
-        data = helpers.parseEventData(each, None, "main", user_ref)
+        data = helpers.parseEventData(each, None, "main", user_data)
         returnData.append(data)
     return returnData
 
@@ -69,6 +69,7 @@ def cancelUserParticipationToEvent(user_ref, eventID):
 
     ## find the event and remove user
     doc_ref = db.collection(u'events').document(eventID)
+    t_doc = doc_ref
     event_document = doc_ref.get().to_dict()
     #event_document['confirmed_participants'].remove(user_ref) 
     event_document['confirmed_participants'] = [x.get().to_dict() for x in event_document['confirmed_participants']]
@@ -88,7 +89,7 @@ def cancelUserParticipationToEvent(user_ref, eventID):
             each['event_id'] = ""
             db.collection(u'user_requests').document(each_id).set(each)
 
-    addNotifications(doc_ref, "remove")
+    addNotifications(t_doc, "remove")
 ### END:: USER OPERATIONS ###
 
 

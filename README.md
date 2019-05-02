@@ -73,7 +73,7 @@ The supported *types* or categories for the search filter are available [here](h
     ```json
     {
         "category": "string",
-        "created_by": "dict, containing with email and name"
+        "created_by": "dict, containing with email and name",
         "count_of_participants": "number",
         "datetime": "datetime-object",
         "details": "string",

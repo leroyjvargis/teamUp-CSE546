@@ -17,8 +17,10 @@ def parseUserFromReference(user, type_of_response ="full"):
             return data
         elif type_of_response == "main":
             del data['location']
-            del data['likes']
-            del data['phone']    
+            if 'likes' in data:
+                del data['likes']
+            if 'phone' in data:
+                del data['phone']    
         return data
 
 def parseGooglePlacesAPIResponse(original_location, response):
@@ -106,4 +108,4 @@ def parseDateTimeFromString(datetime_string):
     time_part = datetime_string[1]
     date_part = date_part.split('/')
     time_part = time_part.split(':')
-    return datetime.datetime(date_part[2], date_part[0], date_part[1], time_part[0], time_part[1], 0)
+    return datetime.datetime(int(date_part[2]), int(date_part[0]), int(date_part[1]), int(time_part[0]), int(time_part[1]), 0)
