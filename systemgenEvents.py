@@ -8,6 +8,7 @@ with open('server/creds.json') as json_file:
 
 
 days={'mon':0, 'tue':1, 'wed':2, 'thu':3, 'fri':4, 'sat':5, 'sun':6  }
+time_of_day={'morn': 8, 'eve': 17}
 
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
@@ -121,7 +122,9 @@ def createSystemEvent(category, event, timetag):
     db = firestore.Client()
 
     d=datetime.datetime.now()
-    next_dt = next_weekday(d, days[timetag.split('-')[0]])
+    time_tag_split = timetag.split('-')
+    d = datetime.datetime(d.year, d.month, d.day, time_of_day[time_tag_split[1]], 0, 0)
+    next_dt = next_weekday(d, days[time_tag_split[0]])
     # print("next_dt ", next_dt)
     # eventdt = str(next_dt)[0:11]+'17'+str(next_dt)[13:19]
 
@@ -144,7 +147,7 @@ def createSystemEvent(category, event, timetag):
         u'created_by': 'System Bot',
         u'confirmed_participants': event['probCandidates']
     })
-    print("printing id " + b.id)
+    print("printing Event id " + b.id)
     for each_request_id in event['request_ids']:
         print(each_request_id)
         query= db.collection(u'user_requests').document(each_request_id).update({ u'event_id': b.id })
@@ -174,9 +177,9 @@ def addNotifications(user_request_ids, event_ref):
 
 def main():
     # timeTags = [u'mon-morn',u'mon-eve', u'tue-morn', u'tue-eve', u'wed-morn', u'wed-eve', u'thu-morn', u'thu-eve', u'fri-morn', u'fri-eve', u'sat-morn', u'sat-eve', u'sun-morn', u'sun-eve']
-    # categories = [u'sports' , u'food' , u'film']
-    timeTags = [u'mon-morn',u'sat-eve',u'sun-morn']
-    categories = [u'sports' , u'food']
+    categories = [u'sports' , u'food' , u'film']
+    timeTags = [u'fri-morn', u'fri-eve', u'sat-morn', u'sat-eve', u'sun-morn', u'sun-eve', u'mon-morn',u'mon-eve']
+    # categories = [u'sports' , u'food']
 
 
     
@@ -187,13 +190,19 @@ def main():
             # print(ActiveRequests)
             if len(ActiveRequests) >0:
                 probableVenues = findVenues(ActiveRequests,[]) #set of probable venues
-                # print("probableVenues")
-                # print(probableVenues)
-                BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
-                BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
-                print(*BestprobableVenues, sep='\n')
-                # print("BestprobableVenues")
-                createSystemEvent(category,BestprobableVenues[0],timetag)
+                if len(probableVenues)>0:
+                    # print("length probableVenues ", len(probableVenues))
+                    probableVenues = list({v['name']:v for v in probableVenues}.values())
+                    # print(probableVenues)
+                    # print("length probableVenues again ", len(probableVenues))
+                    # print(probableVenues)
+                    BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
+                    BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
+                    # print(*BestprobableVenues, sep='\n')
+                    # print("BestprobableVenues")
+                    print("Checking if min of attendees are available " ,len(BestprobableVenues[0]['request_ids']))
+                    if len(BestprobableVenues[0]['request_ids']) >=3:
+                        createSystemEvent(category,BestprobableVenues[0],timetag)
 
 if __name__== "__main__":
     main()
