@@ -7,13 +7,21 @@ with open('server/creds.json') as json_file:
     creds = json.load(json_file)
 
 
-days={'mon':0, 'tues':1, 'wed':2, 'thurs':3, 'fri':4, 'sat':5, 'sun':6  }
+days={'mon':0, 'tue':1, 'wed':2, 'thu':3, 'fri':4, 'sat':5, 'sun':6  }
 
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
     if days_ahead <= 0: # Target day already happened this week
         days_ahead += 7
     return d + datetime.timedelta(days_ahead)
+
+def getGPlacesTypeForCategory(category):
+    categories = {
+        'sports': 'park',
+        'film': 'movie_theater',
+        'food': 'restaurant'
+    }
+    return categories[category]
 
 def getPlacesByCategory(location, category,radii):
     ## location = [<lat>,<long>], category = "sports" , radii = 100* radius(conversion to meters but its not perfect conversion)
@@ -62,7 +70,7 @@ def getActiveRequests(event_id, category, timetag):
     ## user = user-email, from header-value
     ## TODO: change header to 
     db = firestore.Client()
-    categoryType = "stadium"
+    categoryType = getGPlacesTypeForCategory(category)
 
     query = db.collection(u'user_requests').where(u'event_id', u'==' , event_id).where(u'category', u'==' , category).where(u'time_tag', u'==' , timetag)
     query = query.stream()
@@ -112,8 +120,9 @@ def createSystemEvent(category, event, timetag):
     ## event = {name: string, details: string, location-name: location-coords: geopoint, min: number, max: number, datetime: timestamp, status: string, participants: map, category: string}
     db = firestore.Client()
 
-    # d=datetime.datetime.now()
-    # next_dt = next_weekday(d, days[timetag.split('-')[0]])
+    d=datetime.datetime.now()
+    next_dt = next_weekday(d, days[timetag.split('-')[0]])
+    # print("next_dt ", next_dt)
     # eventdt = str(next_dt)[0:11]+'17'+str(next_dt)[13:19]
 
     # user_ref = db.collection(u'users').document(user)
@@ -128,8 +137,8 @@ def createSystemEvent(category, event, timetag):
         u'location_coords': firestore.GeoPoint(float(event['found_loc_coords'][0]), float(event['found_loc_coords'][1])),
         # u'min': int(event['min']),
         # u'max': int(event['max']),
-        # u'datetime': eventdt,
-        u'datetime': datetime.datetime.now() + datetime.timedelta(days=3),
+        u'datetime': next_dt,
+        # u'datetime': datetime.datetime.now() + datetime.timedelta(days=3),
         u'status': 'scheduled',
         u'is_active': True,
         u'created_by': 'System Bot',
@@ -138,46 +147,32 @@ def createSystemEvent(category, event, timetag):
     print("printing id " + b.id)
     for each_request_id in event['request_ids']:
         print(each_request_id)
-        q= db.collection(u'user_requests').document(each_request_id).update({ u'event_id': b.id })
-        # q=q.stream()
-        # print(q)
-        # for each in q:
-        #     print(each.to_dict())
-        # # .set({ u'event_id': b.id })
-    addNotifications(event['request_ids'], b)
+        query= db.collection(u'user_requests').document(each_request_id).update({ u'event_id': b.id })
+        
 
-def addNotifications(user_request_ids, event_ref):
-    #for each user request satisfied, create a notification
-    db = firestore.Client()
-    user_interest_ref = db.collection(u'user_requests')
-    notification_ref = db.collection(u'notifications')
-    event_data = event_ref.get().to_dict()
-    for each in user_request_ids:
-        interest_data = user_interest_ref.document(each).get().to_dict()
-        user_ref = interest_data['user']
-        message = 'New event created - {} on {} at {}'.format(event_data['name'], event_data['datetime'].strftime('%A, %b %d'), event_data['datetime'].strftime('%I:%M %p'))
-        notification_ref.add({
-            u'user': user_ref,
-            u'event': event_ref,
-            u'message': message,
-            u'is_active': True,
-            u'timestamp': datetime.datetime.now()
-        })
 
 def main():
-    # timeTag = [u'Mon_mo',u'Mon_ev', u'Tues_mo', u'Tues_ev', u'Wed_mo', u'Wed_ev', u'Thurs_mo', u'Thurs_ev', u'Fri_mo', u'Fri_ev', u'Fri_nite', u'Sat_mo', u'Sat_ev', u'Sat_nite', u'Sun_mo', u'Sun_ev']
-    timeTag2 = [u'sun-morn', u'fri-eve']
-    category = u'sports'
+    # timeTags = [u'mon-morn',u'mon-eve', u'tue-morn', u'tue-eve', u'wed-morn', u'wed-eve', u'thu-morn', u'thu-eve', u'fri-morn', u'fri-eve', u'sat-morn', u'sat-eve', u'sun-morn', u'sun-eve']
+    # categories = [u'sports' , u'food' , u'film']
+    timeTags = [u'mon-morn',u'sat-eve',u'sun-morn']
+    categories = [u'sports' , u'food']
 
-    for timetag in timeTag2:
-        ActiveRequests = getActiveRequests("", category, timetag)
-        if len(ActiveRequests) >0:
-            probableVenues = findVenues(ActiveRequests,[]) #set of probable venues
-            # print(probableVenues)
-            BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
-            BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
-            # print(*BestprobableVenues, sep='\n')
-            createSystemEvent('sports',BestprobableVenues[2],timetag)
+
+    
+    for category in categories:
+        for timetag in timeTags:
+            ActiveRequests = getActiveRequests("", category, timetag)
+            # print("ActiveRequests")
+            # print(ActiveRequests)
+            if len(ActiveRequests) >0:
+                probableVenues = findVenues(ActiveRequests,[]) #set of probable venues
+                # print("probableVenues")
+                # print(probableVenues)
+                BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
+                BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
+                print(*BestprobableVenues, sep='\n')
+                # print("BestprobableVenues")
+                createSystemEvent(category,BestprobableVenues[0],timetag)
 
 if __name__== "__main__":
     main()
