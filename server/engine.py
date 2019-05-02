@@ -55,7 +55,7 @@ def createUserInterest(user_ref, interest):
         u'category': interest['category'],
         #u'is_active': True,
         u'location': firestore.GeoPoint(float(location[0]), float(location[1])),
-        u'radius': int(interest['radius']),
+        u'radius': float(interest['radius']),
         u'time_tag': interest['time_tag'],
         u'event_id': "",
         u'user': user_ref
