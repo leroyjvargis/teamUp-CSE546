@@ -9,11 +9,11 @@ def root():
     message = "All your base are belong to us!"
     return jsonify({'message': message})
 
-@app.route('/register', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def register():
     if not request or not request.form:
         abort(400)
-    engine.registerUser(request.form)
+    engine.loginUser(request.form)
     return jsonify(success=True), 201
 
 @app.route('/home', methods=['GET'])

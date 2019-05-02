@@ -8,20 +8,25 @@ with open('creds.json') as json_file:
 
 ### BEGIN:: USER OPERATIONS ###
 
-def registerUser(user):
+def loginUser(user):
     ## user -> {email: string, location: geopoint, name: string, phone: string, likes: string list}
     ## TODO: change to get details from Google SSO
     db = firestore.Client()
     location = user['location'].split(',')
     
     doc_ref = db.collection(u'users').document(user['email'])
-    doc_ref.set({
-        u'email': user['email'],
-        u'location': firestore.GeoPoint(float(location[0]), float(location[1])),
-        u'name': user['name'],
-        u'phone': user['phone'],
-        u'likes': user['likes'].split(',')
-    })
+    if (doc_ref.get().exists):
+        #update location
+        doc_ref.update({u'location': firestore.GeoPoint(float(location[0]), float(location[1]))})
+    else:
+        # create user
+        doc_ref.set({
+            u'email': user['email'],
+            u'location': firestore.GeoPoint(float(location[0]), float(location[1])),
+            u'name': user['name']
+            # u'phone': user['phone'],
+            # u'likes': user['likes'].split(',')
+        })
 
 
 def getUserEvents(user_ref):

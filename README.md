@@ -26,6 +26,21 @@ The supported *types* or categories for the search filter are available [here](h
 ***
 
 ### API Reference
+1. /login: login user  
+    method: POST  
+    params: -none-  
+    headers: -none-  
+    returns: -none-  
+    request-body: form-data  
+    ```json
+    {  
+        "name": "string",
+        "email": "string",
+        "location": "string, lat-lng separated by comma"
+    }
+    ```
+
+
 1. /home: get all events of current user  
     method: GET  
     params: -none-  
