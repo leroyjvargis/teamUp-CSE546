@@ -6,6 +6,15 @@ from geopy.distance import geodesic
 with open('server/creds.json') as json_file:  
     creds = json.load(json_file)
 
+
+days={'mon':0, 'tues':1, 'wed':2, 'thurs':3, 'fri':4, 'sat':5, 'sun':6  }
+
+def next_weekday(d, weekday):
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)
+
 def getPlacesByCategory(location, category,radii):
     ## location = [<lat>,<long>], category = "sports" , radii = 100* radius(conversion to meters but its not perfect conversion)
     ## google places API:    
@@ -99,9 +108,14 @@ def findBestVenues(ActiveRequests, probableVenues):
                 eachplacedict['request_ids'].append(eachrequest['request_id'])
     return probableVenues
             
-def createSystemEvent(category, event):
+def createSystemEvent(category, event, timetag):
     ## event = {name: string, details: string, location-name: location-coords: geopoint, min: number, max: number, datetime: timestamp, status: string, participants: map, category: string}
     db = firestore.Client()
+
+    # d=datetime.datetime.now()
+    # next_dt = next_weekday(d, days[timetag.split('-')[0]])
+    # eventdt = str(next_dt)[0:11]+'17'+str(next_dt)[13:19]
+
     # user_ref = db.collection(u'users').document(user)
     # location = event['location'].split(',')
 
@@ -114,6 +128,7 @@ def createSystemEvent(category, event):
         u'location_coords': firestore.GeoPoint(float(event['found_loc_coords'][0]), float(event['found_loc_coords'][1])),
         # u'min': int(event['min']),
         # u'max': int(event['max']),
+        # u'datetime': eventdt,
         u'datetime': datetime.datetime.now() + datetime.timedelta(days=3),
         u'status': 'scheduled',
         u'created_by': 'System Bot',
@@ -144,7 +159,7 @@ def main():
             BestprobableVenues = findBestVenues(ActiveRequests, probableVenues)
             BestprobableVenues = sorted(BestprobableVenues, key=lambda kv: (len(kv['probCandidates']), kv['rating']), reverse=True)
             # print(*BestprobableVenues, sep='\n')
-            createSystemEvent('sports',BestprobableVenues[2])
+            createSystemEvent('sports',BestprobableVenues[2],timetag)
 
 if __name__== "__main__":
     main()
