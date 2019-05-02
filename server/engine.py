@@ -62,6 +62,33 @@ def createUserInterest(user_ref, interest):
     })
 
 
+def getUserInterests(user_ref):
+    db = firestore.Client()
+    query = db.collection(u'user_requests').where(u'user', u'==', user_ref)
+    doc_ref = db.collection(u'events')
+    query = query.stream()
+    returnData = []
+    for each in query:
+        data = each.to_dict()
+        data['id'] = each.id
+        del data['user']
+        data['location'] = helpers.parseGeoPoint(data['location'])
+        if not data['event_id'] == "":
+            data['event'] = helpers.parseEventData(doc_ref.document(data['event_id']).get())
+        returnData.append(data)
+    return returnData
+    
+
+def deleteUserInterest(user_ref, interest_id):
+    db = firestore.Client()
+    doc_ref = db.collection(u'user_requests').document(interest_id)
+    if doc_ref.get().exists:
+        doc_data = doc_ref.get().to_dict()
+        doc_data['user'] = helpers.parseUserFromReference(doc_data['user'])
+        user_data = helpers.parseUserFromReference(user_ref)
+        if doc_data['user']['email'] == user_data['email']:
+            doc_ref.delete()
+
 def cancelUserParticipationToEvent(user_ref, eventID):
     ##TODO: handle errors
     #user_ref = helpers.getUserFromAuthHeader(user_auth)

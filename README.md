@@ -98,7 +98,7 @@ The supported *types* or categories for the search filter are available [here](h
     {  
         "name": "string",
         "details": "string",
-        "location-name": "string",
+        "location_name": "string",
         "location": "string",
         "min": "number",
         "max": "number",
@@ -138,6 +138,30 @@ The supported *types* or categories for the search filter are available [here](h
         "time_tag": "string (eg: sat-eve)"
     }
     ```
+
+1. /get-interests: get all interests of current user  
+    method: GET  
+    headers: Auth: //user_email//  
+    params: -none-  
+    returns:  
+    ```json
+    {  
+        "category": "string",
+        "event_id": "string or empty, depending on if interest is fulfilled",
+        "event": "event data as dict, only if event_id is not empty",
+        "id": "string, the interest id",
+        "location": "string, lat-lng separated by comma",
+        "radius": "decimal",
+        "time_tag": "string, eg: thu-eve"
+    }
+    ```
+
+1. delete-interest: delete a particular interest of the user  
+    method: DELETE  
+    headers: Auth: //user_email//  
+    params:  
+&nbsp;&nbsp; interest_id: string  
+    returns: -none-  
 
 1. /cancel-event-participation: remove current user from an event  
     method: GET  

@@ -103,6 +103,35 @@ def create_interest():
     engine.createUserInterest(user, request.form)
     return jsonify(success=True), 201
 
+@app.route('/get-interests', methods=['GET'])
+def get_interst():
+    if not request:
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    data = engine.getUserInterests(user)
+    return jsonify(data), 200
+
+@app.route('/delete-interest', methods=['DELETE'])
+def delete_interest():
+    if not request or not request.args.get('interest_id'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.deleteUserInterest(user, request.args.get('interest_id'))
+    return jsonify(success=True), 200
+
+
 @app.route('/cancel-event-participation', methods=['GET'])
 def cancel_event_participation():
     if not request or not request.args.get('event_id'):
