@@ -148,7 +148,28 @@ def createSystemEvent(category, event, timetag):
     for each_request_id in event['request_ids']:
         print(each_request_id)
         query= db.collection(u'user_requests').document(each_request_id).update({ u'event_id': b.id })
-        
+    
+    addNotifications(event['request_ids'], b)
+
+def addNotifications(user_request_ids, event_ref):
+    #for each user request satisfied, create a notification
+    db = firestore.Client()
+    user_interest_ref = db.collection(u'user_requests')
+    notification_ref = db.collection(u'notifications')
+    event_data = event_ref.get().to_dict()
+    for each in user_request_ids:
+        interest_data = user_interest_ref.document(each).get().to_dict()
+        user_ref = interest_data['user']
+        message = 'New event created - {} on {} at {}'.format(event_data['name'], event_data['datetime'].strftime('%A, %b %d'), event_data['datetime'].strftime('%I:%M %p'))
+        notification_ref.add({
+            u'user': user_ref,
+            u'event': event_ref,
+            u'message': message,
+            u'is_active': True,
+            u'timestamp': datetime.datetime.now()
+        })
+
+
 
 
 def main():
