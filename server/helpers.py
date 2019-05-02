@@ -69,22 +69,34 @@ def getUserFromAuthHeader(user):
     else:
         raise Exception ("Unauthorized user")
 
-def parseEventData(event, location_coords = None, created_by = "none"):
+def parseEventData(event, location_coords = None, created_by = "none", user = None):
     ## event -> firestore document reference of /events/<id>
+    ## user -> dict
     data = event.to_dict()
-    print (data)
+    data['event_id'] = event.id
+    data['is_owner'] = False
+    data['is_joined'] = False
     if location_coords is not None:
         distance = calculateDistanceBetweenLocationCoordinates(location_coords, parseGeoPoint(data['location_coords'], 'tuple'))
         data['distance'] = distance
+    if user is not None:
+        participants = [x.get().to_dict()['email'] for x in data['confirmed_participants']]
+        if user['email'] in participants:
+            data['is_joined'] = True
     data['count_of_participants'] = len(data['confirmed_participants'])
+    del data['confirmed_participants']
+
     if 'max' in data:
         data['vacancy'] = data['max'] - data['count_of_participants'] if data['max'] - data['count_of_participants'] > 0 else 0
+
     data['location_coords'] = parseGeoPoint(data['location_coords'])
-    del data['confirmed_participants']
     if created_by is not "none":
-        data['created_by'] = parseUserFromReference(data['created_by'], created_by)
+        data['created_by'] = parseUserFromReference(data['created_by'], 'main')
+        if user is not None and data['created_by']['email'] == user['email']:
+            data['is_owner'] = True
     else:
         del data['created_by']
+    del data['is_active']
     return data
 
 def parseDateTimeFromString(datetime_string):

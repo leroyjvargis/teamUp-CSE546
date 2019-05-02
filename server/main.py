@@ -38,10 +38,10 @@ def get_nearby_events():
         abort(401)
     try:
         ## checking auth here
-        helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
     except:
         abort(401)
-    events = engine.getNearbyEvents(request.args.get('location_coords'))
+    events = engine.getNearbyEvents(user, request.args.get('location_coords'))
     return jsonify(events), 200
 
 @app.route('/create-event', methods=['POST'])

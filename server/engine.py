@@ -34,7 +34,7 @@ def getUserEvents(user_ref):
     returnData = []
     for each in query:
         ## each is an event
-        data = helpers.parseEventData(each, None, "main")
+        data = helpers.parseEventData(each, None, "main", user_ref)
         returnData.append(data)
     return returnData
 
@@ -112,13 +112,14 @@ def createEvent(user_ref, event):
     })
 
 
-def getNearbyEvents(location_coords):
+def getNearbyEvents(user, location_coords):
     ##TODO: find a better way utilizing where query in firestore rather than get all and filter
     db = firestore.Client() 
     query = db.collection(u'events')
     query = query.stream()
     location = location_coords.split(',')
     location_coords = (float(location[0]), float(location[1]))
+    user_data = user.get().to_dict()
 
     returnData = []
     for each in query:
@@ -127,7 +128,7 @@ def getNearbyEvents(location_coords):
             distance = helpers.calculateDistanceBetweenLocationCoordinates(location_coords, helpers.parseGeoPoint(data['location_coords'], 'tuple'))
             #print (each.id, distance)
             if distance < 25:
-                data = helpers.parseEventData(each, location_coords)
+                data = helpers.parseEventData(each, location_coords, None, user_data)
                 returnData.append(data)
     return returnData
 

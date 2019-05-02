@@ -58,14 +58,18 @@ The supported *types* or categories for the search filter are available [here](h
     ```json
     {
         "category": "string",
+        "created_by": "dict, containing with email and name"
         "count_of_participants": "number",
         "datetime": "datetime-object",
         "details": "string",
         "distance": "float",
+        "event_id": "string",
+        "is_joined": "bool",
+        "is_owner": "bool",
         "location_coords": "string",
         "location_name": "string",
         "name": "string",
-        "status": "string"
+        "status": "string",
     }  
     ```
 
