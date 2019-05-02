@@ -1,0 +1,3 @@
+[submodule "server/Eevee"]
+	path = server/Eevee
+	url = https://github.com/aniquetahir/Eevee.git
