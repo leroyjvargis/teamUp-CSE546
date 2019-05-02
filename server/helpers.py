@@ -1,6 +1,6 @@
 from google.cloud import firestore
 import geopy.distance
-import requests, json
+import requests, json, datetime
 
 
 
@@ -77,3 +77,12 @@ def parseEventData(event, location_coords = None, created_by = "none"):
     else:
         del data['created_by']
     return data
+
+def parseDateTimeFromString(datetime_string):
+    ## datetime_string: m/d/Y hh:mm 
+    datetime_string = datetime_string.split(' ')
+    date_part = datetime_string[0]
+    time_part = datetime_string[1]
+    date_part = date_part.split('/')
+    time_part = time_part.split(':')
+    return datetime.datetime(date_part[2], date_part[0], date_part[1], time_part[0], time_part[1], 0)

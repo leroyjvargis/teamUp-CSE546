@@ -104,7 +104,7 @@ def createEvent(user_ref, event):
         u'location_coords': firestore.GeoPoint(float(location[0]), float(location[1])),
         u'min': int(event['min']),
         u'max': int(event['max']),
-        u'datetime': datetime.datetime.now(),
+        u'datetime': helpers.parseDateTimeFromString(event['datetime']),
         u'status': 'scheduled',
         u'created_by': user_ref,
         u'confirmed_participants': [user_ref]

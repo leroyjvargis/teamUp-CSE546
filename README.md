@@ -83,7 +83,7 @@ The supported *types* or categories for the search filter are available [here](h
         "location": "string",
         "min": "number",
         "max": "number",
-        "datetime": "string",
+        "datetime": "string, in the format M/d/Y hh:mm",
         "category": "string"
     }
     ```
