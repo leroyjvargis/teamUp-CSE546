@@ -264,7 +264,11 @@ def getNotifications(user_ref):
     returnData = []
     for each in data:
         each = each.to_dict()
-        each['event'] = helpers.parseEventData(each['event'].get())
+        if each['event'].get().exists:
+            each['event'] = helpers.parseEventData(each['event'].get())
+        else:
+            del each['event']
+
         del each['user']
         del each['is_active']
         returnData.append(each)
@@ -299,4 +303,3 @@ def addNotifications(event_ref, mode="add"):
             u'is_active': True,
             u'timestamp': datetime.datetime.now()
         })
-    
