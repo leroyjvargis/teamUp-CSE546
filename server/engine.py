@@ -216,6 +216,7 @@ def deleteEvent(user_ref, event_id):
         events_ref.update({'is_active': False, 'status': 'deleted'})
     else:
         raise Exception("Unauthorized user")
+    addNotifications(events_ref, "delete")
 
 
 def getPlacesByCategory(location, category):
@@ -256,10 +257,12 @@ def addNotifications(event_ref, mode="add"):
     event_data = event_ref.get().to_dict()
 
     if mode == "add":
-        mode = "added to"
-    else:
-        mode = "removed from"
-    message = 'New user {} event - {}. Total participants now at {}'.format(mode, event_data['name'], len(event_data['confirmed_participants']))
+        message = 'New user added to event - {}. Total participants now at {}'.format(event_data['name'], len(event_data['confirmed_participants']))
+    elif mode == "remove":
+        message = 'New user removed from event - {}. Total participants now at {}'.format(event_data['name'], len(event_data['confirmed_participants']))
+    elif mode == "delete":
+        message = 'Event deleted by owner - {}.'.format(event_data['name'])
+    
     for each_user_ref in event_data['confirmed_participants']:
         notification_ref.add({
             u'user': each_user_ref,
