@@ -85,9 +85,10 @@ def cancelUserParticipationToEvent(user_ref, eventID):
         for each in document:
             each_id = each.id
             each = each.to_dict()
-            each['is_active'] = True
+            each['event_id'] = ""
             db.collection(u'user_requests').document(each_id).set(each)
 
+    addNotifications(doc_ref, "remove")
 ### END:: USER OPERATIONS ###
 
 
@@ -194,13 +195,14 @@ def filterEvents(event_name, vacancy, distance, location_coords, category):
     return returnData
 
 
-
 def addEventUser(user_ref, event_id):
     db = firestore.Client()
     events_ref = db.collection(u'events').document(event_id)
     events_data = events_ref.get().to_dict()
     events_data['confirmed_participants'].append(user_ref)
     events_ref.update({'confirmed_participants': events_data['confirmed_participants']})
+    addNotifications(events_ref)
+
 
 
 def deleteEvent(user_ref, event_id):
@@ -245,3 +247,25 @@ def getNotifications(user_ref):
 def getCategories():
     categories = ['sports', 'food']
     return categories
+
+
+def addNotifications(event_ref, mode="add"):
+    #for each user request satisfied, create a notification
+    db = firestore.Client()
+    notification_ref = db.collection(u'notifications')
+    event_data = event_ref.get().to_dict()
+
+    if mode == "add":
+        mode = "added to"
+    else:
+        mode = "removed from"
+    message = 'New user {} event - {}. Total participants now at {}'.format(mode, event_data['name'], len(event_data['confirmed_participants']))
+    for each_user_ref in event_data['confirmed_participants']:
+        notification_ref.add({
+            u'user': each_user_ref,
+            u'event': event_ref,
+            u'message': message,
+            u'is_active': True,
+            u'timestamp': datetime.datetime.now()
+        })
+    
