@@ -2,8 +2,14 @@ from google.cloud import firestore
 import json, requests,geopy, datetime
 from geopy import distance
 from geopy.distance import geodesic
+import time
 
-with open('server/creds.json') as json_file:  
+## DEBUG::
+#with open('server/creds.json') as json_file:  
+    #creds = json.load(json_file)
+
+## PROD::
+with open('creds.json') as json_file:
     creds = json.load(json_file)
 
 
@@ -205,4 +211,14 @@ def main():
                         createSystemEvent(category,BestprobableVenues[0],timetag)
 
 if __name__== "__main__":
-    main()
+    ##PROD::
+    minutes_to_wait = 1
+    while True: 
+        print ("Processing..")
+        main()
+        print ("waiting for {} minutes".format(str(minutes_to_wait)))
+        print ('')
+        time.sleep(60*minutes_to_wait)
+
+    ##DEBUG::
+    #main()
