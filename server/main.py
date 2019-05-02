@@ -135,6 +135,20 @@ def add_event_user():
     engine.addEventUser(user, request.args.get('event_id'))
     return jsonify(success=True), 200
 
+@app.route('/delete-event', methods=['DELETE'])
+def delete_event():
+    if not request or not request.args.get('event_id'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+        engine.deleteEvent(user, request.args.get('event_id'))
+    except:
+        abort(401)
+    return jsonify(success=True), 200
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

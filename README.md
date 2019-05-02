@@ -163,3 +163,10 @@ The supported *types* or categories for the search filter are available [here](h
     headers: -none-  
     params: -none-  
     returns: list of categories  
+
+1. /delete-event: delete an event owned by user  
+    method: DELETE  
+    headers: Auth: //user_email//  
+    params:  
+&nbsp;&nbsp; event_id: string
+    returns: -none-  

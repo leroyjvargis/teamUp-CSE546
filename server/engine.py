@@ -29,7 +29,7 @@ def getUserEvents(user_ref):
     db = firestore.Client()
     #user_ref = helpers.getUserFromAuthHeader(user_ref)
 
-    query = db.collection(u'events').where(u'confirmed_participants', u'array_contains', user_ref)
+    query = db.collection(u'events').where(u'is_active', u'==', True).where(u'confirmed_participants', u'array_contains', user_ref)
     query = query.stream() 
     returnData = []
     for each in query:
@@ -106,6 +106,7 @@ def createEvent(user_ref, event):
         u'max': int(event['max']),
         u'datetime': helpers.parseDateTimeFromString(event['datetime']),
         u'status': 'scheduled',
+        u'is_active': True,
         u'created_by': user_ref,
         u'confirmed_participants': [user_ref]
     })
@@ -122,7 +123,7 @@ def getNearbyEvents(location_coords):
     returnData = []
     for each in query:
         data = each.to_dict()
-        if 'location_coords' in data:
+        if 'location_coords' in data and data['is_active']:
             distance = helpers.calculateDistanceBetweenLocationCoordinates(location_coords, helpers.parseGeoPoint(data['location_coords'], 'tuple'))
             #print (each.id, distance)
             if distance < 25:
@@ -148,9 +149,10 @@ def filterEvents(event_name, vacancy, distance, location_coords, category):
     else:
         events_data = events_ref.stream()
         all_events = []
-        for each in events_data:
-            data = helpers.parseEventData(each, location_coords)
-            all_events.append(data)
+        if event_data['is_active']:
+            for each in events_data:
+                data = helpers.parseEventData(each, location_coords)
+                all_events.append(data)
 
         ## filter events from all_events based on the other params
         #[x for x in all_events if x['max'] - x['count_of_participants'] > vacancy]
@@ -164,6 +166,19 @@ def addEventUser(user_ref, event_id):
     events_data = events_ref.get().to_dict()
     events_data['confirmed_participants'].append(user_ref)
     events_ref.update({'confirmed_participants': events_data['confirmed_participants']})
+
+
+def deleteEvent(user_ref, event_id):
+    db = firestore.Client()
+    events_ref = db.collection(u'events').document(event_id)
+    events_data = events_ref.get().to_dict()
+    created_user = helpers.parseUserFromReference(events_data['created_by'])
+    current_user = helpers.parseUserFromReference(user_ref)
+
+    if created_user['email'] == current_user['email']:
+        events_ref.update({'is_active': False, 'status': 'deleted'})
+    else:
+        raise Exception("Unauthorized user")
 
 
 def getPlacesByCategory(location, category):

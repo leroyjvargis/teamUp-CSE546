@@ -131,6 +131,7 @@ def createSystemEvent(category, event, timetag):
         # u'datetime': eventdt,
         u'datetime': datetime.datetime.now() + datetime.timedelta(days=3),
         u'status': 'scheduled',
+        u'is_active': True,
         u'created_by': 'System Bot',
         u'confirmed_participants': event['probCandidates']
     })
