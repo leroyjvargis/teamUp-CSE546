@@ -174,7 +174,7 @@ The supported *types* or categories for the search filter are available [here](h
     method: GET  
     headers: Auth: //user_email//  
     params:  
-&nbsp;&nbsp; event_id: string 
+&nbsp;&nbsp; event_id: string  
     returns: -none-  
 
 1. /get-categories: get all categories from system  
@@ -187,13 +187,13 @@ The supported *types* or categories for the search filter are available [here](h
     method: DELETE  
     headers: Auth: //user_email//  
     params:  
-&nbsp;&nbsp; event_id: string
+&nbsp;&nbsp; event_id: string  
     returns: -none-  
 
 1. /get-notifications: get all notifications of current user sorted by timestamp  
     method: GET  
     headers: Auth: //user_email//  
-    params: -none- 
+    params: -none-  
     returns:  
     ```json
     {
