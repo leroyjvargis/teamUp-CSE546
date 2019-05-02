@@ -155,7 +155,7 @@ The supported *types* or categories for the search filter are available [here](h
 &nbsp;&nbsp; distance: number (in km), requires location_coords [optional]  
 &nbsp;&nbsp; location_coords: string, requried with distance [optional]  
 &nbsp;&nbsp; vacancy: number [optional]  
-    returns: 
+    returns:  
     ```json
     {
         "category": "string",
@@ -189,3 +189,16 @@ The supported *types* or categories for the search filter are available [here](h
     params:  
 &nbsp;&nbsp; event_id: string
     returns: -none-  
+
+1. /get-notifications: get all notifications of current user sorted by timestamp  
+    method: GET  
+    headers: Auth: //user_email//  
+    params: -none- 
+    returns:  
+    ```json
+    {
+        "message": "string",
+        "timestamp": "datetime object",
+        "event": "dict of event, format as in get-nearby-events"
+    }  
+    ```

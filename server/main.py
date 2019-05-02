@@ -149,6 +149,20 @@ def delete_event():
         abort(401)
     return jsonify(success=True), 200
 
+@app.route('/get-notifications', methods=['GET'])
+def get_notifications():
+    if not request:
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    data = engine.getNotifications(user)
+    return jsonify(data), 200
+
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
     # Engine, a webserver process such as Gunicorn will serve the app. This

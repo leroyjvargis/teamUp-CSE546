@@ -144,8 +144,25 @@ def createSystemEvent(category, event, timetag):
         # for each in q:
         #     print(each.to_dict())
         # # .set({ u'event_id': b.id })
-        
+    addNotifications(event['request_ids'], b)
 
+def addNotifications(user_request_ids, event_ref):
+    #for each user request satisfied, create a notification
+    db = firestore.Client()
+    user_interest_ref = db.collection(u'user_requests')
+    notification_ref = db.collection(u'notifications')
+    event_data = event_ref.get().to_dict()
+    for each in user_request_ids:
+        interest_data = user_interest_ref.document(each).get().to_dict()
+        user_ref = interest_data['user']
+        message = 'New event created - {} on {} at {}'.format(event_data['name'], event_data['datetime'].strftime('%A, %b %d'), event_data['datetime'].strftime('%I:%M %p'))
+        notification_ref.add({
+            u'user': user_ref,
+            u'event': event_ref,
+            u'message': message,
+            u'is_active': True,
+            u'timestamp': datetime.datetime.now()
+        })
 
 def main():
     # timeTag = [u'Mon_mo',u'Mon_ev', u'Tues_mo', u'Tues_ev', u'Wed_mo', u'Wed_ev', u'Thurs_mo', u'Thurs_ev', u'Fri_mo', u'Fri_ev', u'Fri_nite', u'Sat_mo', u'Sat_ev', u'Sat_nite', u'Sun_mo', u'Sun_ev']

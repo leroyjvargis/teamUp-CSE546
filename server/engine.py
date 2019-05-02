@@ -225,6 +225,21 @@ def getPlacesByCategory(location, category):
     data = response.json()
     return helpers.parseGooglePlacesAPIResponse(location, data)
 
+
+def getNotifications(user_ref):
+    db = firestore.Client()
+    query = db.collection(u'notifications').where(u'is_active', u'==', True).where(u'user', u'==', user_ref)
+    data = query.stream()
+    returnData = []
+    for each in data:
+        each = each.to_dict()
+        each['event'] = helpers.parseEventData(each['event'].get())
+        del each['user']
+        del each['is_active']
+        returnData.append(each)
+    returnData = sorted(returnData, key=lambda kv: kv['timestamp'], reverse=True)
+    return returnData
+
 ### END:: EVENT OPERATIONS ###
 
 def getCategories():
