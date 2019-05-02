@@ -140,6 +140,7 @@ def getNearbyEvents(user, location_coords):
 
 def filterEvents(event_name, vacancy, distance, location_coords, category):
     ## TODO: filter based on other params
+    # print("finding event name" + str(event_name))
     db = firestore.Client()
     events_ref = db.collection(u'events')
 
@@ -152,18 +153,46 @@ def filterEvents(event_name, vacancy, distance, location_coords, category):
         event_data = event_data.stream()
         for each in event_data:
             returnData = helpers.parseEventData(each, location_coords)
+            return returnData
+            
     else:
         events_data = events_ref.stream()
         all_events = []
-        if event_data['is_active']:
-            for each in events_data:
-                data = helpers.parseEventData(each, location_coords)
-                all_events.append(data)
+        for each in events_data:
+            data = helpers.parseEventData(each, location_coords)
+            # print(data)
+            all_events.append(data)
+        returnData = all_events
+
+    # print("Testing vars ", category, " ", vacancy," " , distance)
+    if category is not None and len(category)>0:
+        returnData = list(filter(lambda x : str(x['category']) == str(category), returnData))
+
+    # if vacancy is not None:
+    #     returnData = list(filter(lambda x : int(x['vacancy']) >= int(vacancy) if 'vacancy' in x, returnData))
+    results = []
+    if vacancy is not None and len(vacancy)>0:
+        for x in returnData:
+            if 'vacancy' in x.keys():
+                results.append(x)
+
+        returnData = results
+    
+    if distance is not None and len(distance)>0:
+        returnData = list(filter(lambda x : float(x['distance']) <= float(distance), returnData))
+    
+    # print(returnData)
+    
+
+    
+
+
 
         ## filter events from all_events based on the other params
         #[x for x in all_events if x['max'] - x['count_of_participants'] > vacancy]
 
     return returnData
+
 
 
 def addEventUser(user_ref, event_id):
