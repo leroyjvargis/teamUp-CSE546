@@ -60,7 +60,7 @@ def create_event():
 
 @app.route('/get-locations', methods=['GET'])
 def get_locations():
-    if not request:
+    if not request or not request.args.get('location') or not request.args.get('category'):
         abort(400)
     location = request.args.get('location').split(',')
     category = request.args.get('category')
