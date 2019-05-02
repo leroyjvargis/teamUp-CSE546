@@ -169,10 +169,11 @@ def addEventUser(user_ref, event_id):
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"
     ## google places API:    
-    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={},{}&radius=1500&type={}&key={}'.format(location[0], location[1], category, creds['googlePlacesAPIKey'])
+    category = helpers.getGPlacesTypeForCategory(category)
+    url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={},{}&radius=15000&type={}&rankBy=distance&key={}'.format(location[0], location[1], category, creds['googlePlacesAPIKey'])
     response = requests.get(url)
     data = response.json()
-    return helpers.parseGooglePlacesAPIResponse(location, data)[:5]
+    return helpers.parseGooglePlacesAPIResponse(location, data)
 
 ### END:: EVENT OPERATIONS ###
 

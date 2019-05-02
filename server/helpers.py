@@ -31,11 +31,20 @@ def parseGooglePlacesAPIResponse(original_location, response):
             'types': each['types'],
             #'rating': each['rating'],
             'address': each['vicinity'],
+            'location_coords': '{},{}'.format(each_coords[0], each_coords[1]),
             'distance': calculateDistanceBetweenLocationCoordinates(original_coords, each_coords)
         }
         data.append(obj)
     data = sorted(data, key=lambda kv: kv['distance'])
     return data
+
+def getGPlacesTypeForCategory(category):
+    categories = {
+        'sports': 'park',
+        'film': 'movie_theater',
+        'food': 'restaurant'
+    }
+    return categories[category]
 
 def calculateDistanceBetweenLocationCoordinates(coords_1, coords_2, unit='km'):
     distance = geopy.distance.vincenty(coords_1, coords_2)

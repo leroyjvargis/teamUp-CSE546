@@ -99,6 +99,7 @@ The supported *types* or categories for the search filter are available [here](h
     {  
         "address": "string",
         "distance": "float, distance in km from start location",
+        "location_coords": "string, (lat,lon)",  
         "name": "string",
         "types":" list of string, containing category of location"
     }
