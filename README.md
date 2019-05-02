@@ -150,6 +150,13 @@ The supported *types* or categories for the search filter are available [here](h
     }  
     ```
 
+1. /add-event-user: add a user to the specified event  
+    method: GET  
+    headers: Auth: //user_email//  
+    params:  
+&nbsp;&nbsp; event_id: string 
+    returns: -none-  
+
 1. /get-categories: get all categories from system  
     method: GET  
     headers: -none-  

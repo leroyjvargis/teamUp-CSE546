@@ -158,6 +158,14 @@ def filterEvents(event_name, vacancy, distance, location_coords, category):
     return returnData
 
 
+def addEventUser(user_ref, event_id):
+    db = firestore.Client()
+    events_ref = db.collection(u'events').document(event_id)
+    events_data = events_ref.get().to_dict()
+    events_data['confirmed_participants'].append(user_ref)
+    events_ref.update({'confirmed_participants': events_data['confirmed_participants']})
+
+
 def getPlacesByCategory(location, category):
     ## location -> [<lat>,<long>], category = "sports"
     ## google places API:    

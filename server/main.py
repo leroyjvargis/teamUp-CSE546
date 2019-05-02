@@ -109,18 +109,31 @@ def cancel_event_participation():
         abort(400)
     if not request.headers.get('Auth'):
         abort(401)
-    print (request.args.get('oo'))
-    # try:
-    #     ## checking auth here
-    #     user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
-    # except:
-    #     abort(401)
-    # engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.cancelUserParticipationToEvent(user, request.args.get('event_id'))
     return jsonify(success=True), 200
 
 @app.route('/get-categories', methods=['GET'])
 def get_categories():
     return jsonify(engine.getCategories())
+
+@app.route('/add-event-user', methods=['GET'])
+def add_event_user():
+    if not request or not request.args.get('event_id'):
+        abort(400)
+    if not request.headers.get('Auth'):
+        abort(401)
+    try:
+        ## checking auth here
+        user = helpers.getUserFromAuthHeader(request.headers.get('Auth'))
+    except:
+        abort(401)
+    engine.addEventUser(user, request.args.get('event_id'))
+    return jsonify(success=True), 200
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App
