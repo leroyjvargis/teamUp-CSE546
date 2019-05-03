@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, abort
-import engine, helpers
+import engine, helpers, systemgenEvents
 
 app = Flask(__name__)
 
@@ -191,6 +191,12 @@ def get_notifications():
         abort(401)
     data = engine.getNotifications(user)
     return jsonify(data), 200
+
+@app.route('/run-task', methods=['POST'])
+def run_tasks():
+    systemgenEvents.main()
+    return jsonify(success=True), 200
+
 
 if __name__ == '__main__':
     # This is used when running locally only. When deploying to Google App

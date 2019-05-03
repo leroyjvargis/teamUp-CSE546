@@ -161,7 +161,7 @@ def getNearbyEvents(user, location_coords):
         if 'location_coords' in data and data['is_active']:
             distance = helpers.calculateDistanceBetweenLocationCoordinates(location_coords, helpers.parseGeoPoint(data['location_coords'], 'tuple'))
             #print (each.id, distance)
-            if distance < 25:
+            if distance < 35:
                 data = helpers.parseEventData(each, location_coords, None, user_data)
                 returnData.append(data)
     return returnData
